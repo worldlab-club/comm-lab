@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>World Lab — คัดลายมือไทย</title>
+<link href="https://fonts.googleapis.com/css2?family=Sanchez&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  /* World Lab base */
+  --bg:      #F5F2ED;
+  --panel:   #FFFFFF;
+  --border:  #DDD9D2;
+  --text:    #2A2A2A;
+  --muted:   #888880;
+  --dim:     #EDEBE6;
+  --shadow:  rgba(0,0,0,0.07);
+
+  /* Communication branch — Fire #E8522A */
+  --accent:  #E8522A;
+  --accent2: #F07A52;   /* L2 tint ~55% */
+  --accent4: #FAD9CE;   /* L4 tint ~78% */
+  --accent-dark: #B83A10;
+}
+
+html { height: 100%; }
+body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Sarabun', sans-serif;
+  overflow: hidden;
+}
+
+/* ── SCREEN SYSTEM ── */
+.screen {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  visibility: hidden; pointer-events: none; opacity: 0;
+  transition: opacity 0.18s;
+}
+.screen.active { visibility: visible; pointer-events: auto; opacity: 1; }
+
+/* ══════════════════════════════════════
+   TOP BAR (shared)
+══════════════════════════════════════ */
+.topbar {
+  flex-shrink: 0;
+  background: var(--panel);
+  border-bottom: 2px solid var(--border);
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.brand-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0;
+}
+.brand-label {
+  font-family: 'Sanchez', serif;
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.topbar-title {
+  flex: 1;
+  font-family: 'Sanchez', serif;
+  font-size: 1rem;
+  color: var(--text);
+}
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--panel);
+  color: var(--text); font-size: 1rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.12s;
+}
+.icon-btn:active { background: var(--dim); }
+
+/* ══════════════════════════════════════
+   HOME
+══════════════════════════════════════ */
+#home { background: var(--bg); justify-content: flex-start; }
+
+.home-hero {
+  background: var(--panel);
+  border-bottom: 2px solid var(--border);
+  padding: 28px 24px 24px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+}
+.home-hero-label {
+  font-family: 'Sanchez', serif;
+  font-size: 0.72rem;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.brand-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+}
+.brand-name {
+  font-family: 'Sanchez', serif;
+  font-size: 1.05rem; color: var(--text);
+  letter-spacing: 0.02em; line-height: 1.2;
+}
+.brand-sub {
+  font-size: 0.72rem; color: var(--muted);
+  margin-top: 2px; letter-spacing: 0.01em;
+}
+.brand-sub em {
+  font-style: normal;
+  color: var(--accent);
+  font-weight: 600;
+}
+.home-hero-title {
+  font-family: 'Sanchez', serif;
+  font-size: clamp(1.6rem, 7vw, 2.4rem);
+  color: var(--text);
+  line-height: 1.2;
+}
+.home-hero-title em { color: var(--accent); font-style: normal; }
+.home-hero-sub { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+
+.cat-list {
+  flex: 1; overflow-y: auto;
+  padding: 20px 16px 32px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.cat-card {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 18px;
+  display: flex; align-items: center; gap: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.cat-card:active { transform: scale(0.97); }
+.cat-card:hover { border-color: var(--accent2); box-shadow: 0 4px 16px rgba(232,82,42,0.12); }
+.cat-ico {
+  width: 52px; height: 52px; border-radius: 12px;
+  background: var(--accent4);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Sarabun', sans-serif; font-size: 1.8rem;
+  font-weight: 700; color: var(--accent); flex-shrink: 0;
+}
+.cat-body { flex: 1; }
+.cat-title { font-family: 'Sanchez', serif; font-size: 1rem; color: var(--text); }
+.cat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+.cat-arrow { color: var(--border); font-size: 1.1rem; }
+
+/* ══════════════════════════════════════
+   PICKER
+══════════════════════════════════════ */
+#picker { background: var(--bg); }
+
+.chips-row {
+  flex-shrink: 0; display: flex; gap: 8px;
+  padding: 10px 16px; overflow-x: auto; scrollbar-width: none;
+  background: var(--panel); border-bottom: 1px solid var(--border);
+}
+.chips-row::-webkit-scrollbar { display: none; }
+.chip {
+  padding: 5px 14px; border-radius: 20px;
+  border: 1.5px solid var(--border);
+  font-size: 0.78rem; color: var(--muted);
+  white-space: nowrap; cursor: pointer; flex-shrink: 0;
+  font-family: 'Sarabun', sans-serif;
+  background: var(--panel);
+  transition: all 0.13s;
+}
+.chip.on { border-color: var(--accent); color: var(--accent); background: var(--accent4); }
+
+.tiles-wrap {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 14px 16px 90px;
+}
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 9px;
+}
+@media(min-width:380px){ .tiles { grid-template-columns: repeat(6,1fr); } }
+@media(min-width:480px){ .tiles { grid-template-columns: repeat(7,1fr); } }
+
+.tile {
+  aspect-ratio: 1; background: var(--panel);
+  border: 2px solid var(--border); border-radius: 11px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+  transition: transform 0.13s, border-color 0.13s, background 0.13s;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.tile:active { transform: scale(0.87); }
+.tile .tc { font-family:'Sarabun',sans-serif; font-size:clamp(1.3rem,5vw,1.9rem); font-weight:700; line-height:1; color:var(--text); }
+.tile .tn { font-size:0.45rem; color:var(--muted); margin-top:2px; text-align:center; padding:0 2px; line-height:1.2; }
+.tile .tbadge {
+  position:absolute; top:3px; right:3px;
+  width:14px; height:14px; background:var(--accent); border-radius:50%;
+  font-size:8px; color:white; display:none; align-items:center; justify-content:center;
+}
+.tile.on .tbadge { display:flex; }
+.tile.mid { border-color:#c8e6c8; }
+.tile.high { border-color:#fdd0c8; }
+.tile.low { border-color:#c8d8f0; }
+.tile.mid.on  { border-color:#4E8B61; background:#e8f4ec; }
+.tile.high.on { border-color:var(--accent); background:var(--accent4); }
+.tile.low.on  { border-color:#4A6FD4; background:#dce6f8; }
+.tile.vowel.on,.tile.tone.on { border-color:#D4932A; background:#fdf0d8; }
+
+.start-fab {
+  position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+  padding:14px 40px; background:var(--accent); color:white;
+  font-family:'Sarabun',sans-serif; font-size:1rem; font-weight:700;
+  border:none; border-radius:50px; cursor:pointer;
+  box-shadow:0 6px 24px rgba(232,82,42,0.35);
+  display:none; align-items:center; gap:8px; z-index:50;
+  transition: transform 0.12s;
+}
+.start-fab.show { display:flex; }
+.start-fab:active { transform:translateX(-50%) scale(0.95); }
+
+/* ══════════════════════════════════════
+   PRACTICE
+══════════════════════════════════════ */
+#practice { background: var(--bg); }
+
+.p-top {
+  flex-shrink: 0; background: var(--panel);
+  border-bottom: 2px solid var(--border);
+  padding: 10px 14px;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.char-badge {
+  font-family:'Sarabun',sans-serif; font-weight:700;
+  font-size: 1.8rem; background: var(--accent4);
+  color: var(--accent); padding: 2px 14px;
+  border-radius: 10px; line-height: 1.3;
+  border: 1.5px solid var(--accent2);
+}
+.p-prog { flex:1; text-align:right; }
+.p-prog-txt { font-size:0.76rem; color:var(--muted); font-family:'Sanchez',serif; }
+.p-bar { height:4px; background:var(--dim); border-radius:2px; margin-top:4px; overflow:hidden; }
+.p-fill { height:100%; background:var(--accent); border-radius:2px; transition:width 0.35s; }
+
+.p-guide {
+  flex-shrink:0; background:var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 14px;
+  display:flex; align-items:center; gap:14px;
+}
+.g-char {
+  font-family:'Sarabun',sans-serif; font-size:2.8rem; font-weight:700;
+  color:var(--accent4); line-height:1;
+  width:50px; text-align:center; flex-shrink:0;
+  -webkit-text-stroke: 1.5px var(--accent2);
+}
+.g-name { font-size:0.95rem; font-weight:700; color:var(--text); }
+.g-hint { font-size:0.72rem; color:var(--muted); margin-top:2px; }
+
+.p-brush {
+  flex-shrink:0; background:var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 7px 14px; display:flex; align-items:center; gap:10px;
+}
+.brush-lbl { font-size:0.72rem; color:var(--muted); white-space:nowrap; }
+input[type=range] {
+  -webkit-appearance:none; flex:1; height:4px;
+  background:var(--dim); border-radius:2px; outline:none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:20px; height:20px;
+  border-radius:50%; background:var(--accent); cursor:pointer;
+  border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.cdots { display:flex; gap:7px; flex-shrink:0; }
+.cdot {
+  width:22px; height:22px; border-radius:50%; cursor:pointer;
+  border:2px solid transparent; flex-shrink:0; transition:transform 0.12s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.cdot.on { border-color:var(--text); transform:scale(1.25); }
+
+/* Canvas */
+#cvs {
+  flex:1; display:block; width:100%; min-height:0;
+  touch-action:none; cursor:crosshair;
+  background: var(--panel);
+}
+
+.p-tools {
+  flex-shrink:0; background:var(--panel);
+  border-top:2px solid var(--border);
+  padding:10px 14px; display:flex; gap:10px;
+  box-shadow: 0 -2px 8px var(--shadow);
+}
+.tbtn {
+  flex:1; background:var(--dim); border:1.5px solid var(--border);
+  border-radius:12px; padding:10px 4px; color:var(--text);
+  font-family:'Sarabun',sans-serif; font-size:0.82rem; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  transition:transform 0.12s, background 0.12s;
+}
+.tbtn:active { transform:scale(0.91); background:var(--border); }
+.tbtn .ti { font-size:1.15rem; }
+.tbtn.accent { background:var(--accent4); border-color:var(--accent2); color:var(--accent); font-weight:700; }
+.tbtn.accent:active { background:var(--accent2); }
+
+/* ══════════════════════════════════════
+   WORD MODE
+══════════════════════════════════════ */
+#wordmode { background: var(--bg); }
+
+.wm-body {
+  flex:1; overflow-y:auto; padding:18px 16px 24px;
+  display:flex; flex-direction:column; gap:16px;
+}
+.wm-card {
+  background:var(--panel); border:2px solid var(--border);
+  border-radius:14px; padding:16px;
+  box-shadow:0 2px 8px var(--shadow);
+}
+.wm-card-label {
+  font-size:0.72rem; color:var(--muted); margin-bottom:8px;
+  letter-spacing:0.06em; text-transform:uppercase;
+}
+#word-input {
+  width:100%; background:var(--bg); border:2px solid var(--border);
+  border-radius:10px; padding:11px 14px; font-size:1.4rem;
+  font-family:'Sarabun',sans-serif; color:var(--text); outline:none;
+  -webkit-appearance:none; transition:border-color 0.13s;
+}
+#word-input:focus { border-color:var(--accent2); }
+#word-preview {
+  margin-top:10px; min-height:32px;
+  display:flex; align-items:center;
+}
+.preset-chip {
+  padding:6px 14px; background:var(--dim);
+  border:1.5px solid var(--border); border-radius:20px;
+  font-size:0.95rem; font-family:'Sarabun',sans-serif;
+  color:var(--text); cursor:pointer; transition:all 0.13s;
+}
+.preset-chip:active { background:var(--accent4); border-color:var(--accent2); }
+.saved-chip {
+  padding:6px 14px; background:var(--accent4);
+  border:1.5px solid var(--accent2); border-radius:20px;
+  font-size:0.95rem; font-family:'Sarabun',sans-serif;
+  color:var(--accent); cursor:pointer; font-weight:700;
+}
+
+.wm-bottom {
+  flex-shrink:0; background:var(--panel);
+  border-top:2px solid var(--border); padding:12px 16px;
+  display:flex; gap:10px;
+  box-shadow:0 -2px 8px var(--shadow);
+}
+.wm-btn {
+  flex:1; padding:13px; border-radius:12px;
+  font-family:'Sarabun',sans-serif; font-size:0.9rem; font-weight:700;
+  cursor:pointer; border:1.5px solid var(--border);
+  background:var(--dim); color:var(--text);
+  transition:transform 0.12s;
+}
+.wm-btn:active { transform:scale(0.96); }
+.wm-btn.primary { background:var(--accent); border-color:var(--accent); color:white; flex:2; }
+.wm-btn.primary:disabled { opacity:0.4; pointer-events:none; }
+
+/* ══════════════════════════════════════
+   WORD PRACTICE
+══════════════════════════════════════ */
+#wordpractice { background: var(--bg); }
+
+.wp-top {
+  flex-shrink:0; background:var(--panel);
+  border-bottom:2px solid var(--border);
+  padding:10px 14px; display:flex; align-items:center; gap:10px;
+  box-shadow:0 2px 8px var(--shadow);
+}
+.wp-word-badge {
+  font-family:'Sarabun',sans-serif; font-weight:700;
+  font-size:1.5rem; background:var(--accent4);
+  color:var(--accent); padding:3px 14px; border-radius:10px;
+  letter-spacing:0.04em; border:1.5px solid var(--accent2);
+}
+.wp-hint {
+  flex-shrink:0; background:var(--panel);
+  border-bottom:1px solid var(--border);
+  padding:6px 14px;
+  font-size:0.75rem; color:var(--muted);
+  font-family:'Sarabun',sans-serif;
+}
+
+#wcvs {
+  flex:1; display:block; width:100%; min-height:0;
+  touch-action:none; cursor:crosshair;
+  background:var(--panel);
+}
+
+/* ══════════════════════════════════════
+   SAVE TOAST
+══════════════════════════════════════ */
+#save-toast {
+  position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--text); color:white; padding:10px 20px;
+  border-radius:30px; font-size:0.85rem; font-family:'Sarabun',sans-serif;
+  opacity:0; transition:opacity 0.25s, transform 0.25s; pointer-events:none; z-index:200;
+  white-space:nowrap;
+}
+#save-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ══ HOME ══ -->
+<div class="screen active" id="home">
+  <div class="home-hero">
+    <div class="brand-row">
+      <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg" width="42" height="42" style="flex-shrink:0;">
+        <circle cx="11.5" cy="11.5" r="7" fill="#4E8B61"/>
+        <circle cx="22.5" cy="11.5" r="7" fill="#F5B731"/>
+        <circle cx="11.5" cy="22.5" r="7" fill="#E8522A"/>
+        <circle cx="22.5" cy="22.5" r="7" fill="#4A6FD4"/>
+        <circle cx="17"   cy="17"   r="5.5" fill="#fff"/>
+        <text x="17" y="20" text-anchor="middle" font-family="Sanchez,serif" font-size="5" fill="#2A2A2A">WL</text>
+      </svg>
+      <div>
+        <div class="brand-name">World Lab</div>
+        <div class="brand-sub"><em>Communication Lab</em> · คัดลายมือไทย</div>
+      </div>
+    </div>
+    <div class="home-hero-title">คัด<em>ลาย</em>มือ<br>ภาษาไทย</div>
+    <div class="home-hero-sub">เลือกหมวดที่ต้องการฝึก</div>
+  </div>
+  <div class="cat-list">
+    <div class="cat-card" onclick="openPicker('consonant')">
+      <div class="cat-ico">ก</div>
+      <div class="cat-body"><div class="cat-title">พยัญชนะ</div><div class="cat-sub">44 ตัว · กลาง สูง ต่ำ</div></div>
+      <div class="cat-arrow">›</div>
+    </div>
+    <div class="cat-card" onclick="openPicker('vowel')">
+      <div class="cat-ico">า</div>
+      <div class="cat-body"><div class="cat-title">สระ</div><div class="cat-sub">20 รูป</div></div>
+      <div class="cat-arrow">›</div>
+    </div>
+    <div class="cat-card" onclick="openPicker('tone')">
+      <div class="cat-ico" style="font-size:1.1rem">่้๊๋</div>
+      <div class="cat-body"><div class="cat-title">วรรณยุกต์ & เลขไทย</div><div class="cat-sub">4 รูป + เลข ๐–๙</div></div>
+      <div class="cat-arrow">›</div>
+    </div>
+    <div class="cat-card" onclick="openPicker('all')">
+      <div class="cat-ico">🎯</div>
+      <div class="cat-body"><div class="cat-title">ทั้งหมด</div><div class="cat-sub">พยัญชนะ + สระ + วรรณยุกต์</div></div>
+      <div class="cat-arrow">›</div>
+    </div>
+    <div class="cat-card" onclick="show('wordmode')">
+      <div class="cat-ico">📝</div>
+      <div class="cat-body"><div class="cat-title">ฝึกเขียนคำ</div><div class="cat-sub">พิมพ์คำ หรือเลือกจากตัวอย่าง</div></div>
+      <div class="cat-arrow">›</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PICKER ══ -->
+<div class="screen" id="picker">
+  <div class="topbar">
+    <button class="icon-btn" onclick="show('home')">←</button>
+    <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg" width="28" height="28" style="flex-shrink:0;opacity:0.7;">
+      <circle cx="11.5" cy="11.5" r="7" fill="#4E8B61"/>
+      <circle cx="22.5" cy="11.5" r="7" fill="#F5B731"/>
+      <circle cx="11.5" cy="22.5" r="7" fill="#E8522A"/>
+      <circle cx="22.5" cy="22.5" r="7" fill="#4A6FD4"/>
+      <circle cx="17"   cy="17"   r="5.5" fill="#fff"/>
+      <text x="17" y="20" text-anchor="middle" font-family="Sanchez,serif" font-size="5" fill="#2A2A2A">WL</text>
+    </svg>
+    <div class="topbar-title" id="picker-title">เลือกตัวอักษร</div>
+    <button class="icon-btn" style="width:auto;padding:0 12px;border-radius:8px;font-size:0.75rem;" onclick="selectAll()">เลือกทั้งหมด</button>
+  </div>
+  <div class="chips-row" id="chips"></div>
+  <div class="tiles-wrap"><div class="tiles" id="tiles"></div></div>
+  <button class="start-fab" id="fab" onclick="startPractice()">
+    ✏️ <span id="fab-txt">เริ่มฝึก</span>
+  </button>
+</div>
+
+<!-- ══ PRACTICE ══ -->
+<div class="screen" id="practice">
+  <div class="p-top">
+    <button class="icon-btn" onclick="show('home')">←</button>
+    <div class="char-badge" id="p-char">ก</div>
+    <div class="p-prog">
+      <div class="p-prog-txt" id="p-txt">1 / 1</div>
+      <div class="p-bar"><div class="p-fill" id="p-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="p-guide">
+    <div class="g-char" id="g-char">ก</div>
+    <div>
+      <div class="g-name" id="g-name">ก ไก่</div>
+      <div class="g-hint" id="g-hint">อักษรกลาง</div>
+    </div>
+  </div>
+  <div class="p-brush">
+    <div class="brush-lbl">🖊️ ขนาด</div>
+    <input type="range" id="bsize" min="3" max="32" value="10" oninput="brushSize=+this.value">
+    <div class="cdots" id="cdots"></div>
+  </div>
+  <canvas id="cvs"></canvas>
+  <div class="p-tools">
+    <button class="tbtn" onclick="clearDraw()"><span class="ti">🗑️</span><span>ลบ</span></button>
+    <button class="tbtn" onclick="toggleGhost()"><span class="ti" id="ghost-ico">👁️</span><span>ตัวอย่าง</span></button>
+    <button class="tbtn accent" onclick="saveCanvas()"><span class="ti">💾</span><span>บันทึก</span></button>
+    <button class="tbtn accent" onclick="nextChar()" style="background:var(--accent);border-color:var(--accent);color:white;"><span class="ti">→</span><span id="next-lbl">ถัดไป</span></button>
+  </div>
+</div>
+
+<!-- ══ WORD MODE ══ -->
+<div class="screen" id="wordmode">
+  <div class="topbar">
+    <button class="icon-btn" onclick="show('home')">←</button>
+    <div class="topbar-title">ฝึกเขียนคำ</div>
+  </div>
+  <div class="wm-body">
+    <div class="wm-card">
+      <div class="wm-card-label">พิมพ์คำที่ต้องการฝึก</div>
+      <input id="word-input" type="text" placeholder="เช่น แมว, บ้าน, โรงเรียน…" oninput="updateWordPreview()">
+      <div id="word-preview"><span style="font-size:0.85rem;color:var(--muted);">จะแสดงตัวอย่างที่นี่</span></div>
+    </div>
+    <div class="wm-card">
+      <div class="wm-card-label">คำตัวอย่าง</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="preset-wrap"></div>
+    </div>
+    <div class="wm-card" id="saved-section" style="display:none;">
+      <div class="wm-card-label">คำที่บันทึกไว้</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="saved-wrap"></div>
+    </div>
+  </div>
+  <div class="wm-bottom">
+    <button class="wm-btn" onclick="saveWord()">💾 บันทึกคำ</button>
+    <button class="wm-btn primary" id="start-word-btn" onclick="startWordPractice()" disabled>✏️ เริ่มฝึก</button>
+  </div>
+</div>
+
+<!-- ══ WORD PRACTICE ══ -->
+<div class="screen" id="wordpractice">
+  <div class="wp-top">
+    <button class="icon-btn" onclick="show('wordmode')">←</button>
+    <div class="wp-word-badge" id="wp-word">แมว</div>
+    <div class="p-prog">
+      <div class="p-prog-txt" id="wp-count">1 / 1</div>
+      <div class="p-bar"><div class="p-fill" id="wp-fill" style="width:100%"></div></div>
+    </div>
+  </div>
+  <div class="wp-hint">ลากเขียนคำตามตัวอย่างจาง ๆ</div>
+  <div class="p-brush">
+    <div class="brush-lbl">🖊️ ขนาด</div>
+    <input type="range" id="wbsize" min="3" max="40" value="14" oninput="brushSize=+this.value">
+    <div class="cdots" id="wcdots"></div>
+  </div>
+  <canvas id="wcvs"></canvas>
+  <div class="p-tools">
+    <button class="tbtn" onclick="wpClear()"><span class="ti">🗑️</span><span>ลบ</span></button>
+    <button class="tbtn" onclick="wpToggleGhost()"><span class="ti" id="wp-ghost-ico">👁️</span><span>ตัวอย่าง</span></button>
+    <button class="tbtn accent" onclick="saveWordCanvas()"><span class="ti">💾</span><span>บันทึก</span></button>
+    <button class="tbtn accent" onclick="wpNext()" style="background:var(--accent);border-color:var(--accent);color:white;"><span class="ti">→</span><span id="wp-next-lbl">ถัดไป</span></button>
+  </div>
+</div>
+
+<!-- save toast -->
+<div id="save-toast">📥 บันทึกรูปแล้ว!</div>
+
+<script>
+/* ═══════════════════════════════════════
+   DATA
+═══════════════════════════════════════ */
+const CON = [
+  {ch:'ก',nm:'ไก่',cl:'mid'},{ch:'ข',nm:'ไข่',cl:'high'},{ch:'ฃ',nm:'ขวด',cl:'high'},
+  {ch:'ค',nm:'ควาย',cl:'low'},{ch:'ฅ',nm:'คน',cl:'low'},{ch:'ฆ',nm:'ระฆัง',cl:'low'},
+  {ch:'ง',nm:'งู',cl:'low'},{ch:'จ',nm:'จาน',cl:'mid'},{ch:'ฉ',nm:'ฉิ่ง',cl:'high'},
+  {ch:'ช',nm:'ช้าง',cl:'low'},{ch:'ซ',nm:'โซ่',cl:'low'},{ch:'ฌ',nm:'เฌอ',cl:'low'},
+  {ch:'ญ',nm:'หญิง',cl:'low'},{ch:'ฎ',nm:'ชฎา',cl:'mid'},{ch:'ฏ',nm:'ปฏัก',cl:'mid'},
+  {ch:'ฐ',nm:'ฐาน',cl:'high'},{ch:'ฑ',nm:'มณโฑ',cl:'low'},{ch:'ฒ',nm:'ผู้เฒ่า',cl:'low'},
+  {ch:'ณ',nm:'เณร',cl:'low'},{ch:'ด',nm:'เด็ก',cl:'mid'},{ch:'ต',nm:'เต่า',cl:'mid'},
+  {ch:'ถ',nm:'ถุง',cl:'high'},{ch:'ท',nm:'ทหาร',cl:'low'},{ch:'ธ',nm:'ธง',cl:'low'},
+  {ch:'น',nm:'หนู',cl:'low'},{ch:'บ',nm:'ใบไม้',cl:'mid'},{ch:'ป',nm:'ปลา',cl:'mid'},
+  {ch:'ผ',nm:'ผึ้ง',cl:'high'},{ch:'ฝ',nm:'ฝา',cl:'high'},{ch:'พ',nm:'พาน',cl:'low'},
+  {ch:'ฟ',nm:'ฟัน',cl:'low'},{ch:'ภ',nm:'สำเภา',cl:'low'},{ch:'ม',nm:'ม้า',cl:'low'},
+  {ch:'ย',nm:'ยักษ์',cl:'low'},{ch:'ร',nm:'เรือ',cl:'low'},{ch:'ล',nm:'ลิง',cl:'low'},
+  {ch:'ว',nm:'แหวน',cl:'low'},{ch:'ศ',nm:'ศาลา',cl:'high'},{ch:'ษ',nm:'ฤๅษี',cl:'high'},
+  {ch:'ส',nm:'เสือ',cl:'high'},{ch:'ห',nm:'หีบ',cl:'high'},{ch:'ฬ',nm:'จุฬา',cl:'low'},
+  {ch:'อ',nm:'อ่าง',cl:'mid'},{ch:'ฮ',nm:'นกฮูก',cl:'low'},
+].map(o=>({...o,tp:'consonant'}));
+
+const VOW=[
+  {ch:'า',nm:'อา'},{ch:'ิ',nm:'อิ'},{ch:'ี',nm:'อี'},{ch:'ึ',nm:'อึ'},{ch:'ื',nm:'อือ'},
+  {ch:'ุ',nm:'อุ'},{ch:'ู',nm:'อู'},{ch:'เ',nm:'เอ'},{ch:'แ',nm:'แอ'},{ch:'โ',nm:'โอ'},
+  {ch:'ใ',nm:'ใอ'},{ch:'ไ',nm:'ไอ'},{ch:'ำ',nm:'อำ'},{ch:'็',nm:'ไต่คู้'},{ch:'ั',nm:'หันอากาศ'},
+  {ch:'อา',nm:'อา(คู่)'},{ch:'เอ',nm:'เอ(คู่)'},{ch:'แอ',nm:'แอ(คู่)'},{ch:'เอา',nm:'เอา'},{ch:'อำ',nm:'อำ(คู่)'},
+].map(o=>({...o,tp:'vowel'}));
+
+const TON=[
+  {ch:'่',nm:'ไม้เอก'},{ch:'้',nm:'ไม้โท'},{ch:'๊',nm:'ไม้ตรี'},{ch:'๋',nm:'ไม้จัตวา'},
+  {ch:'๑',nm:'เลข ๑'},{ch:'๒',nm:'เลข ๒'},{ch:'๓',nm:'เลข ๓'},{ch:'๔',nm:'เลข ๔'},
+  {ch:'๕',nm:'เลข ๕'},{ch:'๖',nm:'เลข ๖'},{ch:'๗',nm:'เลข ๗'},{ch:'๘',nm:'เลข ๘'},
+  {ch:'๙',nm:'เลข ๙'},{ch:'๐',nm:'เลข ๐'},
+].map(o=>({...o,tp:'tone'}));
+
+const CLABEL={mid:'อักษรกลาง',high:'อักษรสูง',low:'อักษรต่ำ'};
+const COLORS=['#2A2A2A','#E8522A','#D4932A','#4E8B61','#4A6FD4','#7E5BAE'];
+
+const PRESETS={
+  'สัตว์':['แมว','หมา','ปลา','วัว','ช้าง','ม้า','กบ','นก','กระต่าย'],
+  'บ้าน':['บ้าน','ห้อง','ประตู','โต๊ะ','เก้าอี้','เตียง','ครัว'],
+  'ธรรมชาติ':['น้ำ','ฟ้า','ดาว','เดือน','ต้นไม้','ดอกไม้','ภูเขา'],
+  'ครอบครัว':['แม่','พ่อ','ลูก','พี่','น้อง','ปู่','ย่า','ตา','ยาย'],
+  'โรงเรียน':['ครู','เพื่อน','หนังสือ','ดินสอ','กระดาน','โรงเรียน'],
+  'อาหาร':['ข้าว','น้ำ','ไข่','ผัก','ผลไม้','ขนม','นม'],
+};
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let mode='consonant', filt='all', sel=new Set();
+let queue=[], qi=0;
+let isDrawing=false, lx=0, ly=0;
+let brushColor='#2A2A2A', brushSize=10;
+let showGhost=true, showWordGhost=true;
+let savedWords=JSON.parse(localStorage.getItem('wl_words3')||'[]');
+let currentWord='';
+let wordQueue=[], wordIdx=0;
+
+/* ═══════════════════════════════════════
+   CANVAS — CHAR
+═══════════════════════════════════════ */
+const cvs=document.getElementById('cvs');
+const ctx=cvs.getContext('2d');
+
+function fitCanvas(){
+  const w=cvs.offsetWidth, h=cvs.offsetHeight;
+  if(!w||!h) return;
+  cvs.width=w; cvs.height=h;
+  redraw();
+}
+
+function redraw(){
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  drawGuideLines(ctx, cvs.width, cvs.height, queue[qi]?.ch||'ก');
+  if(showGhost && queue[qi]) drawGhostChar(ctx, cvs.width, cvs.height, queue[qi].ch);
+}
+
+/* ── Reference-based guide lines ── */
+function getRefMetrics(context, fs){
+  context.font=`bold ${fs}px 'Sarabun',sans-serif`;
+  const m=context.measureText('ก');
+  return {
+    asc:  m.actualBoundingBoxAscent  || fs*0.72,
+    desc: m.actualBoundingBoxDescent || fs*0.18,
+  };
+}
+
+function calcCharLayout(w, h, ch){
+  const maxFS = h * 0.55;
+  ctx.font=`bold ${maxFS}px 'Sarabun',sans-serif`;
+  const tw=ctx.measureText(ch).width;
+  const fs = tw > w*0.82 ? maxFS*(w*0.82/tw) : maxFS;
+  const ref=getRefMetrics(ctx, fs);
+  const bandH=ref.asc+ref.desc;
+  const topY=(h-bandH)/2;
+  const baseY=topY+ref.asc;
+  return {fs, topY, baseY};
+}
+
+function drawGuideLines(context, w, h, ch){
+  const {topY, baseY}=calcCharLayout(w, h, ch);
+  context.save();
+  context.strokeStyle='rgba(232,82,42,0.28)';
+  context.lineWidth=1.5;
+  [topY, baseY].forEach(y=>{
+    context.beginPath(); context.moveTo(0,y); context.lineTo(w,y); context.stroke();
+  });
+  context.restore();
+}
+
+function drawGhostChar(context, w, h, ch){
+  const {fs, baseY}=calcCharLayout(w, h, ch);
+  context.save();
+  context.font=`bold ${fs}px 'Sarabun',sans-serif`;
+  context.fillStyle='rgba(232,82,42,0.12)';
+  context.textAlign='center';
+  context.textBaseline='alphabetic';
+  context.fillText(ch, w/2, baseY);
+  context.restore();
+}
+
+function clearDraw(){ redraw(); }
+function toggleGhost(){
+  showGhost=!showGhost;
+  document.getElementById('ghost-ico').textContent=showGhost?'👁️':'🙈';
+  redraw();
+}
+
+/* ── Pointer events ── */
+function pPos(e, canvas){
+  const r=canvas.getBoundingClientRect();
+  return [(e.clientX-r.left)*(canvas.width/r.width),(e.clientY-r.top)*(canvas.height/r.height)];
+}
+
+cvs.addEventListener('pointerdown',e=>{
+  e.preventDefault(); cvs.setPointerCapture(e.pointerId); isDrawing=true;
+  [lx,ly]=pPos(e,cvs);
+  ctx.beginPath(); ctx.arc(lx,ly,brushSize/2,0,Math.PI*2);
+  ctx.fillStyle=brushColor; ctx.fill();
+},{passive:false});
+cvs.addEventListener('pointermove',e=>{
+  if(!isDrawing) return; e.preventDefault();
+  const [x,y]=pPos(e,cvs);
+  ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(x,y);
+  ctx.strokeStyle=brushColor; ctx.lineWidth=brushSize;
+  ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke();
+  lx=x; ly=y;
+},{passive:false});
+cvs.addEventListener('pointerup',    ()=>isDrawing=false);
+cvs.addEventListener('pointercancel',()=>isDrawing=false);
+cvs.addEventListener('pointerleave', ()=>isDrawing=false);
+
+/* ═══════════════════════════════════════
+   CANVAS — WORD
+═══════════════════════════════════════ */
+const wcvs=document.getElementById('wcvs');
+const wctx=wcvs.getContext('2d');
+let wDrawing=false, wlx=0, wly=0;
+
+function fitWordCanvas(){
+  const w=wcvs.offsetWidth, h=wcvs.offsetHeight;
+  if(!w||!h) return;
+  wcvs.width=w; wcvs.height=h;
+  redrawWord();
+}
+
+function redrawWord(){
+  const w=wcvs.width, h=wcvs.height;
+  wctx.clearRect(0,0,w,h);
+  if(!wordQueue[wordIdx]) return;
+  const word=wordQueue[wordIdx];
+
+  // Font: fill 50% height, scale down if too wide
+  const maxFS=h*0.50;
+  wctx.font=`bold ${maxFS}px 'Sarabun',sans-serif`;
+  const tw=wctx.measureText(word).width;
+  const fs=tw>w*0.88 ? maxFS*(w*0.88/tw) : maxFS;
+
+  // Reference from ก
+  wctx.font=`bold ${fs}px 'Sarabun',sans-serif`;
+  const ref=wctx.measureText('ก');
+  const refAsc =ref.actualBoundingBoxAscent  || fs*0.72;
+  const refDesc=ref.actualBoundingBoxDescent || fs*0.18;
+  const topY=(h-(refAsc+refDesc))/2;
+  const baseY=topY+refAsc;
+
+  // Guide lines
+  wctx.save();
+  wctx.strokeStyle='rgba(232,82,42,0.28)';
+  wctx.lineWidth=1.5;
+  [topY, baseY].forEach(y=>{
+    wctx.beginPath(); wctx.moveTo(0,y); wctx.lineTo(w,y); wctx.stroke();
+  });
+  wctx.restore();
+
+  // Ghost
+  if(showWordGhost){
+    wctx.save();
+    wctx.font=`bold ${fs}px 'Sarabun',sans-serif`;
+    wctx.fillStyle='rgba(232,82,42,0.12)';
+    wctx.textAlign='center';
+    wctx.textBaseline='alphabetic';
+    wctx.fillText(word, w/2, baseY);
+    wctx.restore();
+  }
+}
+
+wcvs.addEventListener('pointerdown',e=>{
+  e.preventDefault(); wcvs.setPointerCapture(e.pointerId); wDrawing=true;
+  [wlx,wly]=pPos(e,wcvs);
+  wctx.beginPath(); wctx.arc(wlx,wly,brushSize/2,0,Math.PI*2);
+  wctx.fillStyle=brushColor; wctx.fill();
+},{passive:false});
+wcvs.addEventListener('pointermove',e=>{
+  if(!wDrawing) return; e.preventDefault();
+  const [x,y]=pPos(e,wcvs);
+  wctx.beginPath(); wctx.moveTo(wlx,wly); wctx.lineTo(x,y);
+  wctx.strokeStyle=brushColor; wctx.lineWidth=brushSize;
+  wctx.lineCap='round'; wctx.lineJoin='round'; wctx.stroke();
+  wlx=x; wly=y;
+},{passive:false});
+wcvs.addEventListener('pointerup',    ()=>wDrawing=false);
+wcvs.addEventListener('pointercancel',()=>wDrawing=false);
+wcvs.addEventListener('pointerleave', ()=>wDrawing=false);
+
+function wpClear(){ redrawWord(); }
+function wpToggleGhost(){
+  showWordGhost=!showWordGhost;
+  document.getElementById('wp-ghost-ico').textContent=showWordGhost?'👁️':'🙈';
+  redrawWord();
+}
+function wpNext(){
+  wordIdx++;
+  if(wordIdx>=wordQueue.length){ show('wordmode'); return; }
+  loadWord(wordIdx);
+}
+
+/* ═══════════════════════════════════════
+   SAVE IMAGE
+═══════════════════════════════════════ */
+function saveCanvasToFile(canvas, filename){
+  // Composite: white bg + guide lines + user drawing
+  const off=document.createElement('canvas');
+  off.width=canvas.width; off.height=canvas.height;
+  const octx=off.getContext('2d');
+
+  // White background
+  octx.fillStyle='#FFFFFF';
+  octx.fillRect(0,0,off.width,off.height);
+
+  // Draw the canvas content on top
+  octx.drawImage(canvas,0,0);
+
+  // Download
+  const a=document.createElement('a');
+  a.href=off.toDataURL('image/png');
+  a.download=filename;
+  a.click();
+  showToast();
+}
+
+function saveCanvas(){
+  const ch=queue[qi]?.ch||'char';
+  const ts=new Date().toISOString().slice(0,19).replace(/[T:]/g,'-');
+  saveCanvasToFile(cvs, `wl-thai-${ch}-${ts}.png`);
+}
+
+function saveWordCanvas(){
+  const word=wordQueue[wordIdx]||'word';
+  const ts=new Date().toISOString().slice(0,19).replace(/[T:]/g,'-');
+  saveCanvasToFile(wcvs, `wl-thai-${word}-${ts}.png`);
+}
+
+function showToast(){
+  const t=document.getElementById('save-toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* ═══════════════════════════════════════
+   SCREEN NAV
+═══════════════════════════════════════ */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='practice')    requestAnimationFrame(()=>requestAnimationFrame(fitCanvas));
+  if(id==='wordpractice') requestAnimationFrame(()=>requestAnimationFrame(fitWordCanvas));
+  if(id==='wordmode')    initWordMode();
+}
+
+window.addEventListener('resize',()=>{
+  if(document.getElementById('practice').classList.contains('active'))     fitCanvas();
+  if(document.getElementById('wordpractice').classList.contains('active')) fitWordCanvas();
+});
+
+/* ═══════════════════════════════════════
+   PICKER
+═══════════════════════════════════════ */
+function getData(){
+  if(mode==='consonant') return CON;
+  if(mode==='vowel')     return VOW;
+  if(mode==='tone')      return TON;
+  return [...CON,...VOW,...TON];
+}
+
+function openPicker(m){
+  mode=m; filt='all'; sel.clear();
+  const T={consonant:'เลือกพยัญชนะ',vowel:'เลือกสระ',tone:'เลือกวรรณยุกต์',all:'เลือกทุกหมวด'};
+  document.getElementById('picker-title').textContent=T[m];
+  renderChips(); renderTiles(); updateFab();
+  show('picker');
+}
+
+function renderChips(){
+  const el=document.getElementById('chips');
+  el.innerHTML='';
+  const list=[{id:'all',lb:'ทั้งหมด'}];
+  if(mode==='consonant'||mode==='all')
+    list.push({id:'mid',lb:'อักษรกลาง'},{id:'high',lb:'อักษรสูง'},{id:'low',lb:'อักษรต่ำ'});
+  list.forEach(f=>{
+    const d=document.createElement('div');
+    d.className='chip'+(f.id===filt?' on':'');
+    d.textContent=f.lb;
+    d.onclick=()=>{ filt=f.id; renderChips(); renderTiles(); };
+    el.appendChild(d);
+  });
+}
+
+function renderTiles(){
+  const el=document.getElementById('tiles');
+  el.innerHTML='';
+  getData().forEach(item=>{
+    if(filt!=='all'&&item.cl!==filt) return;
+    const d=document.createElement('div');
+    d.className='tile '+(item.cl||item.tp||'vowel')+(sel.has(item.ch)?' on':'');
+    d.innerHTML=`<div class="tc">${item.ch}</div><div class="tn">${item.nm||''}</div><div class="tbadge">✓</div>`;
+    d.onclick=()=>{
+      sel.has(item.ch)?sel.delete(item.ch):sel.add(item.ch);
+      d.classList.toggle('on',sel.has(item.ch));
+      updateFab();
+    };
+    el.appendChild(d);
+  });
+}
+
+function selectAll(){ getData().forEach(i=>sel.add(i.ch)); renderTiles(); updateFab(); }
+
+function updateFab(){
+  const fab=document.getElementById('fab');
+  document.getElementById('fab-txt').textContent=sel.size?`เริ่มฝึก ${sel.size} ตัว`:'เริ่มฝึก';
+  fab.classList.toggle('show',sel.size>0);
+}
+
+/* ═══════════════════════════════════════
+   PRACTICE
+═══════════════════════════════════════ */
+function startPractice(){
+  queue=getData().filter(i=>sel.has(i.ch)).sort(()=>Math.random()-0.5);
+  qi=0;
+  show('practice');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ fitCanvas(); loadChar(0); }));
+}
+
+function loadChar(idx){
+  const it=queue[idx];
+  document.getElementById('p-char').textContent=it.ch;
+  document.getElementById('g-char').textContent=it.ch;
+  document.getElementById('g-name').textContent=it.ch+' '+(it.nm||'');
+  document.getElementById('g-hint').textContent=it.cl?CLABEL[it.cl]:(it.tp==='vowel'?'สระ':'วรรณยุกต์');
+  document.getElementById('p-txt').textContent=`${idx+1} / ${queue.length}`;
+  document.getElementById('p-fill').style.width=`${((idx+1)/queue.length)*100}%`;
+  document.getElementById('next-lbl').textContent=idx+1>=queue.length?'จบ':'ถัดไป';
+  redraw();
+}
+
+function nextChar(){
+  qi++;
+  if(qi>=queue.length){ show('home'); return; }
+  loadChar(qi);
+}
+
+/* ═══════════════════════════════════════
+   WORD MODE
+═══════════════════════════════════════ */
+function initWordMode(){
+  const pw=document.getElementById('preset-wrap');
+  pw.innerHTML='';
+  Object.entries(PRESETS).forEach(([cat,words])=>{
+    const lbl=document.createElement('div');
+    lbl.style.cssText='width:100%;font-size:0.7rem;color:var(--muted);margin-top:6px;letter-spacing:0.06em;text-transform:uppercase;';
+    lbl.textContent=cat;
+    pw.appendChild(lbl);
+    words.forEach(w=>{
+      const b=document.createElement('div');
+      b.className='preset-chip';
+      b.textContent=w;
+      b.onclick=()=>{ document.getElementById('word-input').value=w; updateWordPreview(); };
+      pw.appendChild(b);
+    });
+  });
+  renderSaved();
+  updateWordPreview();
+}
+
+function renderSaved(){
+  const sw=document.getElementById('saved-wrap');
+  const sec=document.getElementById('saved-section');
+  sw.innerHTML='';
+  if(!savedWords.length){ sec.style.display='none'; return; }
+  sec.style.display='block';
+  savedWords.forEach((w,i)=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:4px;';
+    const b=document.createElement('div');
+    b.className='saved-chip'; b.textContent=w;
+    b.onclick=()=>{ document.getElementById('word-input').value=w; updateWordPreview(); };
+    const del=document.createElement('div');
+    del.style.cssText='width:20px;height:20px;border-radius:50%;background:var(--dim);display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;color:var(--muted);flex-shrink:0;';
+    del.textContent='✕';
+    del.onclick=()=>{ savedWords.splice(i,1); localStorage.setItem('wl_words3',JSON.stringify(savedWords)); renderSaved(); };
+    row.appendChild(b); row.appendChild(del);
+    sw.appendChild(row);
+  });
+}
+
+function updateWordPreview(){
+  const val=document.getElementById('word-input').value.trim();
+  currentWord=val;
+  const prev=document.getElementById('word-preview');
+  const btn=document.getElementById('start-word-btn');
+  if(!val){
+    prev.innerHTML='<span style="font-size:0.85rem;color:var(--muted);">จะแสดงตัวอย่างที่นี่</span>';
+    btn.disabled=true; return;
+  }
+  prev.innerHTML=`<span style="font-size:2rem;font-family:'Sarabun',sans-serif;font-weight:700;color:var(--accent);">${val}</span>`;
+  btn.disabled=false;
+}
+
+function saveWord(){
+  const w=document.getElementById('word-input').value.trim();
+  if(!w||savedWords.includes(w)) return;
+  savedWords.push(w);
+  localStorage.setItem('wl_words3',JSON.stringify(savedWords));
+  renderSaved();
+}
+
+function startWordPractice(){
+  if(!currentWord) return;
+  wordQueue=[currentWord]; wordIdx=0;
+  show('wordpractice');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ fitWordCanvas(); loadWord(0); }));
+}
+
+function loadWord(idx){
+  const w=wordQueue[idx];
+  document.getElementById('wp-word').textContent=w;
+  document.getElementById('wp-count').textContent=`${idx+1} / ${wordQueue.length}`;
+  document.getElementById('wp-fill').style.width=`${((idx+1)/wordQueue.length)*100}%`;
+  document.getElementById('wp-next-lbl').textContent=idx+1>=wordQueue.length?'จบ':'ถัดไป';
+  redrawWord();
+}
+
+/* ═══════════════════════════════════════
+   COLOR DOTS
+═══════════════════════════════════════ */
+function initColorDots(containerId){
+  const el=document.getElementById(containerId);
+  COLORS.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='cdot'+(c===brushColor?' on':'');
+    d.style.background=c;
+    d.onclick=()=>{
+      brushColor=c;
+      document.querySelectorAll('.cdot').forEach(x=>x.classList.remove('on'));
+      document.querySelectorAll('.cdot').forEach(x=>{ if(x.style.background===c) x.classList.add('on'); });
+    };
+    el.appendChild(d);
+  });
+}
+
+initColorDots('cdots');
+initColorDots('wcdots');
+</script>
+</body>
+</html>
