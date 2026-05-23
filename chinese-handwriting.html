@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>World Lab — 写字练习</title>
+<link href="https://fonts.googleapis.com/css2?family=Sanchez&family=Noto+Sans+SC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  /* World Lab base tokens — exact match to homepage */
+  --bg:      #F5F2ED;
+  --panel:   #FFFFFF;
+  --border:  #DDD9D2;
+  --text:    #2A2A2A;
+  --muted:   #888880;
+  --dim:     #EDEBE6;
+  --shadow:  rgba(0,0,0,0.07);
+
+  /* Communication / Fire branch — burnt orange */
+  --accent:      #E8522A;
+  --accent2:     #F07A52;      /* L2 tint ~55% */
+  --accent4:     #FAD9CE;      /* L4 tint ~78% */
+  --accent-dark: #B83A10;
+}
+
+html { height: 100%; }
+body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Sanchez', serif;
+  overflow: hidden;
+}
+
+/* ── SCREEN SYSTEM (same as Thai app — opacity fade) ── */
+.screen {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  visibility: hidden; pointer-events: none; opacity: 0;
+  transition: opacity 0.18s;
+}
+.screen.active { visibility: visible; pointer-events: auto; opacity: 1; }
+
+/* ── TOPBAR ── */
+.topbar {
+  flex-shrink: 0;
+  background: var(--panel);
+  border-bottom: 2px solid var(--border);
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.brand-label { font-family: 'Sanchez', serif; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.05em; }
+.topbar-title { flex: 1; font-family: 'Sanchez', serif; font-size: 1rem; color: var(--text); }
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1.5px solid var(--border); background: var(--panel);
+  color: var(--text); font-size: 1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.12s;
+}
+.icon-btn:active { background: var(--dim); }
+
+/* ── HOME ── */
+#home { background: var(--bg); }
+
+.home-hero {
+  background: var(--panel);
+  border-bottom: 2px solid var(--border);
+  padding: 24px 20px 20px;
+  display: flex; flex-direction: column; gap: 4px;
+  flex-shrink: 0;
+}
+.brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.brand-name { font-family: 'Sanchez', serif; font-size: 1rem; color: var(--text); letter-spacing: 0.02em; }
+.brand-sub  { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+.brand-sub em { font-style: normal; color: var(--accent); font-weight: 600; }
+.home-hero-title {
+  font-family: 'Sanchez', serif;
+  font-size: clamp(1.5rem, 7vw, 2.2rem);
+  color: var(--text); line-height: 1.2;
+}
+.home-hero-title em { color: var(--accent); font-style: normal; }
+.home-hero-sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+.mode-toggle-bar {
+  flex-shrink: 0; background: var(--panel);
+  border-bottom: 2px solid var(--border);
+  padding: 10px 16px; display: flex; gap: 8px;
+}
+.mode-btn {
+  flex: 1; padding: 9px 8px; border-radius: 10px;
+  border: 1.5px solid var(--border); background: var(--dim);
+  font-family: 'Sanchez', serif; font-size: 0.82rem;
+  color: var(--muted); cursor: pointer; transition: all 0.13s;
+}
+.mode-btn.active {
+  background: var(--accent4); border-color: var(--accent2); color: var(--accent);
+}
+
+.cat-list {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 14px 16px 32px; display: flex; flex-direction: column; gap: 10px;
+}
+.cat-card {
+  background: var(--panel); border: 2px solid var(--border); border-radius: 14px;
+  padding: 16px; display: flex; align-items: center; gap: 14px;
+  cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.cat-card:active { transform: scale(0.97); }
+.cat-card:hover  { border-color: var(--accent2); box-shadow: 0 4px 16px rgba(74,111,212,0.12); }
+.cat-ico {
+  width: 50px; height: 50px; border-radius: 12px;
+  background: var(--accent4); display: flex; align-items: center; justify-content: center;
+  font-family: 'Noto Sans SC', sans-serif; font-size: 1.6rem; font-weight: 700;
+  color: var(--accent); flex-shrink: 0;
+}
+.cat-body { flex: 1; }
+.cat-title { font-family: 'Sanchez', serif; font-size: 0.95rem; color: var(--text); }
+.cat-sub   { font-size: 0.74rem; color: var(--muted); margin-top: 2px; }
+.cat-arrow { color: var(--border); font-size: 1.1rem; }
+
+/* Word mode home */
+#panel-word { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px 16px 32px; display: flex; flex-direction: column; gap: 12px; }
+.wm-card {
+  background: var(--panel); border: 2px solid var(--border);
+  border-radius: 14px; padding: 14px; box-shadow: 0 2px 8px var(--shadow);
+}
+.wm-card-label { font-size: 0.68rem; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.07em; text-transform: uppercase; font-family: 'Sanchez', serif; }
+.chin-input {
+  width: 100%; background: var(--bg); border: 2px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+  font-size: 1.3rem; font-family: 'Noto Sans SC', sans-serif;
+  color: var(--text); outline: none; transition: border-color 0.13s;
+}
+.chin-input:focus { border-color: var(--accent2); }
+.wm-row { display: flex; gap: 8px; margin-top: 8px; }
+.wm-btn {
+  flex: 1; padding: 10px; border-radius: 10px;
+  font-family: 'Sanchez', serif; font-size: 0.82rem; cursor: pointer;
+  border: 1.5px solid var(--border); background: var(--dim); color: var(--text);
+  transition: transform 0.12s;
+}
+.wm-btn:active { transform: scale(0.95); }
+.wm-btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+.chips-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.preset-chip {
+  padding: 6px 14px; background: var(--dim); border: 1.5px solid var(--border);
+  border-radius: 20px; font-size: 0.95rem; font-family: 'Noto Sans SC', sans-serif;
+  color: var(--text); cursor: pointer; transition: all 0.13s;
+}
+.preset-chip:active { background: var(--accent4); border-color: var(--accent2); }
+.saved-chip {
+  padding: 6px 14px; background: var(--accent4); border: 1.5px solid var(--accent2);
+  border-radius: 20px; font-size: 0.95rem; font-family: 'Noto Sans SC', sans-serif;
+  color: var(--accent); cursor: pointer; font-weight: 700;
+}
+
+/* ── PICKER (character selection) ── */
+#picker { background: var(--bg); }
+.chips-row {
+  flex-shrink: 0; display: flex; gap: 8px;
+  padding: 10px 16px; overflow-x: auto; scrollbar-width: none;
+  background: var(--panel); border-bottom: 1px solid var(--border);
+}
+.chips-row::-webkit-scrollbar { display: none; }
+.filt-chip {
+  padding: 5px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+  font-size: 0.76rem; color: var(--muted); white-space: nowrap; cursor: pointer;
+  background: var(--panel); transition: all 0.13s; font-family: 'Sanchez', serif;
+}
+.filt-chip.on { border-color: var(--accent); color: var(--accent); background: var(--accent4); }
+.tiles-wrap { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 14px 90px; }
+.tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+@media(min-width:380px){ .tiles { grid-template-columns: repeat(6,1fr); } }
+@media(min-width:480px){ .tiles { grid-template-columns: repeat(7,1fr); } }
+.tile {
+  aspect-ratio: 1; background: var(--panel);
+  border: 2px solid var(--border); border-radius: 10px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+  transition: transform 0.13s, border-color 0.13s, background 0.13s;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.tile:active { transform: scale(0.87); }
+.tile .tc { font-family: 'Noto Sans SC', sans-serif; font-size: clamp(1.2rem,5vw,1.7rem); font-weight: 700; line-height: 1; color: var(--text); }
+.tile .tn { font-size: 0.42rem; color: var(--muted); margin-top: 2px; text-align: center; padding: 0 2px; line-height: 1.2; }
+.tile .tbadge {
+  position: absolute; top: 3px; right: 3px;
+  width: 14px; height: 14px; background: var(--accent); border-radius: 50%;
+  font-size: 8px; color: white; display: none; align-items: center; justify-content: center;
+}
+.tile.on .tbadge { display: flex; }
+.tile.on { border-color: var(--accent); background: var(--accent4); }
+.start-fab {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  padding: 14px 40px; background: var(--accent); color: white;
+  font-family: 'Sanchez', serif; font-size: 1rem;
+  border: none; border-radius: 50px; cursor: pointer;
+  box-shadow: 0 6px 24px rgba(74,111,212,0.35);
+  display: none; align-items: center; gap: 8px; z-index: 50;
+  transition: transform 0.12s;
+}
+.start-fab.show { display: flex; }
+.start-fab:active { transform: translateX(-50%) scale(0.95); }
+
+/* ── PRACTICE ── */
+#practice { background: var(--bg); }
+
+.p-top {
+  flex-shrink: 0; background: var(--panel);
+  border-bottom: 2px solid var(--border);
+  padding: 10px 14px; display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.char-badge {
+  font-family: 'Noto Sans SC', sans-serif; font-weight: 900;
+  font-size: 1.7rem; background: var(--accent4);
+  color: var(--accent); padding: 2px 12px;
+  border-radius: 10px; line-height: 1.3;
+  border: 1.5px solid var(--accent2);
+}
+.p-prog { flex: 1; text-align: right; }
+.p-prog-txt { font-size: 0.74rem; color: var(--muted); font-family: 'Sanchez', serif; }
+.p-bar { height: 4px; background: var(--dim); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+.p-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.35s; }
+
+/* Character info strip */
+.p-info {
+  flex-shrink: 0; background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 14px; display: flex; align-items: center; gap: 12px;
+}
+.g-char {
+  font-family: 'Noto Sans SC', sans-serif; font-size: 2.6rem; font-weight: 900;
+  color: var(--accent4); line-height: 1;
+  width: 52px; text-align: center; flex-shrink: 0;
+  -webkit-text-stroke: 1.5px var(--accent2);
+}
+.g-meta { display: flex; flex-direction: column; gap: 1px; }
+.g-pinyin { font-size: 1rem; font-weight: 700; color: var(--text); font-family: 'Sanchez', serif; }
+.g-translation { font-size: 0.78rem; color: var(--muted); }
+
+/* Brush bar */
+.p-brush {
+  flex-shrink: 0; background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 7px 14px; display: flex; align-items: center; gap: 10px;
+}
+.brush-lbl { font-size: 0.7rem; color: var(--muted); white-space: nowrap; font-family: 'Sanchez', serif; }
+input[type=range] {
+  -webkit-appearance: none; flex: 1; height: 4px;
+  background: var(--dim); border-radius: 2px; outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--accent); cursor: pointer;
+  border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.cdots { display: flex; gap: 6px; flex-shrink: 0; }
+.cdot {
+  width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
+  border: 2px solid transparent; flex-shrink: 0; transition: transform 0.12s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.cdot.on { border-color: var(--text); transform: scale(1.25); }
+
+/* Canvas — fills all remaining space */
+#cvs {
+  flex: 1; display: block; width: 100%; min-height: 0;
+  touch-action: none; cursor: crosshair;
+  background: var(--panel);
+}
+
+/* Bottom tools */
+.p-tools {
+  flex-shrink: 0; background: var(--panel);
+  border-top: 2px solid var(--border);
+  padding: 10px 14px; display: flex; gap: 10px;
+  box-shadow: 0 -2px 8px var(--shadow);
+}
+.tbtn {
+  flex: 1; background: var(--dim); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 10px 4px; color: var(--text);
+  font-family: 'Sanchez', serif; font-size: 0.8rem; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  transition: transform 0.12s, background 0.12s;
+}
+.tbtn:active { transform: scale(0.91); background: var(--border); }
+.tbtn .ti { font-size: 1.1rem; }
+.tbtn.accent { background: var(--accent4); border-color: var(--accent2); color: var(--accent); font-weight: 700; }
+.tbtn.accent:active { background: var(--accent2); color: white; }
+
+/* ── SUMMARY ── */
+#summary { background: var(--bg); justify-content: center; align-items: center; padding: 20px; overflow-y: auto; }
+.sum-card {
+  background: var(--panel); border: 2px solid var(--border);
+  border-radius: 20px; padding: 26px 22px;
+  width: 100%; max-width: 380px; box-shadow: 0 4px 20px var(--shadow);
+}
+.sum-trophy { font-size: 52px; text-align: center; margin-bottom: 6px; }
+.sum-title  { font-family: 'Sanchez', serif; font-size: 1.2rem; color: var(--text); text-align: center; }
+.sum-avg    { font-family: 'Sanchez', serif; font-size: 2.8rem; text-align: center; margin: 6px 0; color: var(--accent); }
+.sum-stats  { display: flex; gap: 10px; margin: 10px 0; }
+.stat-box   { flex: 1; background: var(--dim); border-radius: 10px; padding: 10px; text-align: center; }
+.stat-num   { font-family: 'Sanchez', serif; font-size: 1.5rem; }
+.stat-lbl   { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+.sum-results { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; justify-content: center; }
+.res-pill {
+  font-family: 'Noto Sans SC', sans-serif; font-size: 0.95rem;
+  padding: 5px 12px; border-radius: 18px; display: flex; gap: 5px; align-items: center;
+  background: var(--dim); border: 1.5px solid var(--border);
+}
+.sum-btn {
+  width: 100%; padding: 13px; border-radius: 12px; border: none;
+  font-family: 'Sanchez', serif; font-size: 0.9rem; cursor: pointer; margin-top: 8px;
+}
+.sum-btn.primary { background: var(--accent); color: white; }
+.sum-btn.secondary { background: var(--dim); color: var(--muted); border: 1.5px solid var(--border); }
+
+/* ── SPEAKER BUTTON ── */
+.btn-speak {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1.5px solid var(--border); background: var(--panel);
+  font-size: 1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.12s;
+}
+.btn-speak:active { background: var(--dim); }
+.btn-speak.speaking {
+  background: var(--accent4);
+  border-color: var(--accent2);
+  animation: pulse-ring 0.65s ease-in-out infinite alternate;
+}
+@keyframes pulse-ring {
+  from { box-shadow: 0 0 0 0   rgba(232,82,42,0.30); }
+  to   { box-shadow: 0 0 0 7px rgba(232,82,42,0); }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════ HOME ══════ -->
+<div class="screen active" id="home">
+  <div class="home-hero">
+    <div class="brand-row">
+      <!-- World Lab 4-circle logo -->
+      <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg" width="42" height="42" style="flex-shrink:0">
+        <circle cx="11.5" cy="11.5" r="7" fill="#4E8B61"/>
+        <circle cx="22.5" cy="11.5" r="7" fill="#F5B731"/>
+        <circle cx="11.5" cy="22.5" r="7" fill="#E8522A"/>
+        <circle cx="22.5" cy="22.5" r="7" fill="#4A6FD4"/>
+        <circle cx="17"   cy="17"   r="5.5" fill="#fff"/>
+        <text x="17" y="20" text-anchor="middle" font-family="Sanchez,serif" font-size="5" fill="#2A2A2A">WL</text>
+      </svg>
+      <div>
+        <div class="brand-name">World Lab</div>
+        <div class="brand-sub"><em>Communication Lab</em> · 写字练习</div>
+      </div>
+    </div>
+    <div class="home-hero-title">写<em>字</em>练习</div>
+    <div class="home-hero-sub">Chinese Writing Practice · HSK 1</div>
+  </div>
+
+  <div class="mode-toggle-bar">
+    <button class="mode-btn active" id="btn-mode-char" onclick="setHomeMode('char')">Character 字</button>
+    <button class="mode-btn" id="btn-mode-word" onclick="setHomeMode('word')">Word / Phrase 词</button>
+  </div>
+
+  <!-- Character mode: category cards -->
+  <div id="panel-char" class="cat-list">
+    <div class="cat-card" onclick="openPicker('numbers')">
+      <div class="cat-ico">一</div>
+      <div class="cat-body"><div class="cat-title">Numbers 数字</div><div class="cat-sub">一 二 三 … 千 · 12 chars</div></div>
+      <div class="cat-arrow">›</div>
+    </div>
+    <div class="cat-card" onclick="openPicker('greetings')">
+      <div class="cat-ico">你</div>
+      <div class="cat-body"><div class="cat-title">People & Greetings 问候</div><div class="cat-sub">你 我 他 好 谢 … · 12 chars</div></div>
+      <div class="cat-arrow">›</div>
+    </div>
+    <div class="cat-card" onclick="openPicker('family')">
+      <div class="cat-ico">家</div>
+      <div class="cat-body"><div class="cat-title">Family 家人</div><div class="cat-sub">爸 妈 哥 姐 弟 … · 10 chars</div></div>
+      <div class="cat-arrow">›</div>
+    </div>
+    <div class="cat-card" onclick="openPicker('objects')">
+      <div class="cat-ico">书</div>
+      <div class="cat-body"><div class="cat-title">Objects 物品</div><div class="cat-sub">书 本 笔 水 茶 … · 11 chars</div></div>
+      <div class="cat-arrow">›</div>
+    </div>
+    <div class="cat-card" onclick="openPicker('verbs')">
+      <div class="cat-ico">爱</div>
+      <div class="cat-body"><div class="cat-title">Verbs 动词</div><div class="cat-sub">来 去 有 吃 喝 爱 … · 12 chars</div></div>
+      <div class="cat-arrow">›</div>
+    </div>
+    <div class="cat-card" onclick="openPicker('adjectives')">
+      <div class="cat-ico">大</div>
+      <div class="cat-body"><div class="cat-title">Adjectives 形容词</div><div class="cat-sub">大 小 多 少 快 慢 … · 12 chars</div></div>
+      <div class="cat-arrow">›</div>
+    </div>
+    <div class="cat-card" onclick="openPicker('all')">
+      <div class="cat-ico">🎯</div>
+      <div class="cat-body"><div class="cat-title">All Characters 全部</div><div class="cat-sub">All 69 HSK 1 characters</div></div>
+      <div class="cat-arrow">›</div>
+    </div>
+  </div>
+
+  <!-- Word mode -->
+  <div id="panel-word" style="display:none;flex:1;overflow-y:auto;padding:14px 16px 32px;display:none;flex-direction:column;gap:12px;">
+    <div class="wm-card">
+      <div class="wm-card-label">Type a word or phrase</div>
+      <input class="chin-input" id="inp-now" placeholder="你好…" maxlength="8">
+      <div class="wm-row">
+        <button class="wm-btn primary" onclick="practiceWordNow()">Practice now ✏️</button>
+        <button class="wm-btn" onclick="saveWord()">Save 💾</button>
+      </div>
+    </div>
+    <div class="wm-card">
+      <div class="wm-card-label">Preset phrases</div>
+      <div class="chips-wrap" id="preset-wrap"></div>
+    </div>
+    <div class="wm-card" id="saved-section" style="display:none">
+      <div class="wm-card-label">Saved words</div>
+      <div class="chips-wrap" id="saved-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PICKER ══════ -->
+<div class="screen" id="picker">
+  <div class="topbar">
+    <button class="icon-btn" onclick="show('home')">←</button>
+    <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg" width="26" height="26" style="flex-shrink:0;opacity:0.7">
+      <circle cx="11.5" cy="11.5" r="7" fill="#4E8B61"/>
+      <circle cx="22.5" cy="11.5" r="7" fill="#F5B731"/>
+      <circle cx="11.5" cy="22.5" r="7" fill="#E8522A"/>
+      <circle cx="22.5" cy="22.5" r="7" fill="#4A6FD4"/>
+      <circle cx="17"   cy="17"   r="5.5" fill="#fff"/>
+      <text x="17" y="20" text-anchor="middle" font-family="Sanchez,serif" font-size="5" fill="#2A2A2A">WL</text>
+    </svg>
+    <div class="topbar-title" id="picker-title">Select Characters</div>
+    <button class="icon-btn" style="width:auto;padding:0 12px;border-radius:8px;font-size:0.72rem" onclick="selectAll()">All</button>
+  </div>
+  <div class="chips-row" id="filt-chips"></div>
+  <div class="tiles-wrap"><div class="tiles" id="tiles"></div></div>
+  <button class="start-fab" id="fab" onclick="startFromPicker()">
+    ✏️ <span id="fab-txt">Practice</span>
+  </button>
+</div>
+
+<!-- ══════ PRACTICE ══════ -->
+<div class="screen" id="practice">
+  <div class="p-top">
+    <button class="icon-btn" onclick="show('home')">←</button>
+    <div class="char-badge" id="p-char">一</div>
+    <div class="p-prog">
+      <div class="p-prog-txt" id="p-txt">1 / 1</div>
+      <div class="p-bar"><div class="p-fill" id="p-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- Info strip: big ghost char + pinyin + translation -->
+  <div class="p-info">
+    <div class="g-char" id="g-char">一</div>
+    <div class="g-meta">
+      <div class="g-pinyin" id="g-pinyin">yī</div>
+      <div class="g-translation" id="g-translation">one · หนึ่ง</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+      <button class="btn-speak" id="btn-speak" onclick="speakCurrent()" title="Play pronunciation">🔊</button>
+      <button class="icon-btn" id="btn-ghost" onclick="toggleGhost()" title="Toggle ghost">👁</button>
+    </div>
+  </div>
+
+  <!-- Brush controls -->
+  <div class="p-brush">
+    <span class="brush-lbl">Size</span>
+    <input type="range" id="brush-sz" min="3" max="28" value="10">
+    <div class="cdots" id="cdots"></div>
+  </div>
+
+  <!-- Canvas — takes all remaining height -->
+  <canvas id="cvs"></canvas>
+
+  <!-- Bottom actions -->
+  <div class="p-tools">
+    <button class="tbtn" onclick="clearCanvas()"><span class="ti">🗑</span>Clear</button>
+    <button class="tbtn accent" id="next-btn" onclick="nextChar()"><span class="ti">→</span><span id="next-lbl">Next</span></button>
+  </div>
+</div>
+
+<!-- ══════ SUMMARY ══════ -->
+<div class="screen" id="summary">
+  <div class="sum-card">
+    <div class="sum-trophy" id="sum-trophy">🏆</div>
+    <div class="sum-title">Session Complete!</div>
+    <div class="sum-avg" id="sum-avg">—</div>
+    <div class="sum-stats">
+      <div class="stat-box"><div class="stat-num" id="st-done">0</div><div class="stat-lbl">Practiced</div></div>
+      <div class="stat-box"><div class="stat-num" id="st-total">0</div><div class="stat-lbl">Total</div></div>
+    </div>
+    <div class="sum-results" id="sum-results"></div>
+    <button class="sum-btn primary" onclick="show('home')">🏠 Home</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════
+const CHAR_DATA = {
+  numbers:    [
+    {ch:'一',py:'yī',  en:'one',      th:'หนึ่ง'},
+    {ch:'二',py:'èr',  en:'two',      th:'สอง'},
+    {ch:'三',py:'sān', en:'three',    th:'สาม'},
+    {ch:'四',py:'sì',  en:'four',     th:'สี่'},
+    {ch:'五',py:'wǔ',  en:'five',     th:'ห้า'},
+    {ch:'六',py:'liù', en:'six',      th:'หก'},
+    {ch:'七',py:'qī',  en:'seven',    th:'เจ็ด'},
+    {ch:'八',py:'bā',  en:'eight',    th:'แปด'},
+    {ch:'九',py:'jiǔ', en:'nine',     th:'เก้า'},
+    {ch:'十',py:'shí', en:'ten',      th:'สิบ'},
+    {ch:'百',py:'bǎi', en:'hundred',  th:'ร้อย'},
+    {ch:'千',py:'qiān',en:'thousand', th:'พัน'},
+  ],
+  greetings: [
+    {ch:'你',py:'nǐ',  en:'you',      th:'คุณ'},
+    {ch:'我',py:'wǒ',  en:'I / me',   th:'ฉัน'},
+    {ch:'他',py:'tā',  en:'he / him', th:'เขา'},
+    {ch:'她',py:'tā',  en:'she / her',th:'เธอ'},
+    {ch:'好',py:'hǎo', en:'good',     th:'ดี'},
+    {ch:'不',py:'bù',  en:'no / not', th:'ไม่'},
+    {ch:'是',py:'shì', en:'is / am',  th:'เป็น/คือ'},
+    {ch:'对',py:'duì', en:'correct',  th:'ถูก'},
+    {ch:'谢',py:'xiè', en:'thank',    th:'ขอบคุณ'},
+    {ch:'再',py:'zài', en:'again',    th:'อีก'},
+    {ch:'见',py:'jiàn',en:'see',      th:'พบ'},
+    {ch:'请',py:'qǐng',en:'please',   th:'กรุณา'},
+  ],
+  family: [
+    {ch:'爸',py:'bà',  en:'dad',      th:'พ่อ'},
+    {ch:'妈',py:'mā',  en:'mom',      th:'แม่'},
+    {ch:'哥',py:'gē',  en:'older bro',th:'พี่ชาย'},
+    {ch:'姐',py:'jiě', en:'older sis',th:'พี่สาว'},
+    {ch:'弟',py:'dì',  en:'younger bro',th:'น้องชาย'},
+    {ch:'妹',py:'mèi', en:'younger sis',th:'น้องสาว'},
+    {ch:'人',py:'rén', en:'person',   th:'คน'},
+    {ch:'子',py:'zǐ',  en:'child/son',th:'ลูกชาย'},
+    {ch:'女',py:'nǚ',  en:'female',   th:'หญิง'},
+    {ch:'家',py:'jiā', en:'home/family',th:'บ้าน/ครอบครัว'},
+  ],
+  objects: [
+    {ch:'书',py:'shū', en:'book',     th:'หนังสือ'},
+    {ch:'本',py:'běn', en:'notebook', th:'สมุด'},
+    {ch:'笔',py:'bǐ',  en:'pen',      th:'ปากกา'},
+    {ch:'纸',py:'zhǐ', en:'paper',    th:'กระดาษ'},
+    {ch:'水',py:'shuǐ',en:'water',    th:'น้ำ'},
+    {ch:'茶',py:'chá', en:'tea',      th:'ชา'},
+    {ch:'米',py:'mǐ',  en:'rice',     th:'ข้าว'},
+    {ch:'车',py:'chē', en:'car',      th:'รถ'},
+    {ch:'门',py:'mén', en:'door',     th:'ประตู'},
+    {ch:'桌',py:'zhuō',en:'table',    th:'โต๊ะ'},
+    {ch:'椅',py:'yǐ',  en:'chair',    th:'เก้าอี้'},
+  ],
+  verbs: [
+    {ch:'来',py:'lái', en:'come',     th:'มา'},
+    {ch:'去',py:'qù',  en:'go',       th:'ไป'},
+    {ch:'有',py:'yǒu', en:'have',     th:'มี'},
+    {ch:'没',py:'méi', en:'not have', th:'ไม่มี'},
+    {ch:'吃',py:'chī', en:'eat',      th:'กิน'},
+    {ch:'喝',py:'hē',  en:'drink',    th:'ดื่ม'},
+    {ch:'说',py:'shuō',en:'speak',    th:'พูด'},
+    {ch:'看',py:'kàn', en:'look',     th:'ดู'},
+    {ch:'做',py:'zuò', en:'do / make',th:'ทำ'},
+    {ch:'学',py:'xué', en:'study',    th:'เรียน'},
+    {ch:'爱',py:'ài',  en:'love',     th:'รัก'},
+    {ch:'叫',py:'jiào',en:'call / named',th:'ชื่อ'},
+  ],
+  adjectives: [
+    {ch:'大',py:'dà',  en:'big',      th:'ใหญ่'},
+    {ch:'小',py:'xiǎo',en:'small',    th:'เล็ก'},
+    {ch:'多',py:'duō', en:'many',     th:'มาก'},
+    {ch:'少',py:'shǎo',en:'few',      th:'น้อย'},
+    {ch:'新',py:'xīn', en:'new',      th:'ใหม่'},
+    {ch:'老',py:'lǎo', en:'old',      th:'แก่'},
+    {ch:'快',py:'kuài',en:'fast',     th:'เร็ว'},
+    {ch:'慢',py:'màn', en:'slow',     th:'ช้า'},
+    {ch:'高',py:'gāo', en:'tall',     th:'สูง'},
+    {ch:'低',py:'dī',  en:'low',      th:'ต่ำ'},
+    {ch:'好',py:'hǎo', en:'good',     th:'ดี'},
+    {ch:'坏',py:'huài',en:'bad',      th:'แย่'},
+  ],
+};
+
+const ALL_CHARS = Object.values(CHAR_DATA).flat();
+
+const PRESET_WORDS = [
+  '你好','谢谢','再见','对不起','没关系',
+  '老师','同学','爸爸','妈妈','我爱你',
+  '中文','很好','朋友','学校','中国','泰国',
+];
+
+const COLORS = ['#1A1A2E','#1B4332','#7B2D00','#3D0066','#7A0000','#0A3D62'];
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let pickerGroup = 'all';
+let sel = new Set();
+let queue = [], qi = 0;
+let brushColor = COLORS[0], brushSize = 10;
+let drawing = false, lx = 0, ly = 0;
+let ghostOn = true;
+let savedWords = JSON.parse(localStorage.getItem('wl_zh_words') || '[]');
+let cvs, ctx;
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  cvs = document.getElementById('cvs');
+  ctx = cvs.getContext('2d');
+
+  cvs.addEventListener('pointerdown', pd);
+  cvs.addEventListener('pointermove', pm);
+  cvs.addEventListener('pointerup',   pu);
+  cvs.addEventListener('pointercancel', pu);
+  cvs.addEventListener('contextmenu', e => e.preventDefault());
+
+  document.getElementById('brush-sz').addEventListener('input', e => { brushSize = +e.target.value; });
+
+  initColorDots();
+  buildPresets();
+  renderSaved();
+  initTTS();
+
+  window.addEventListener('resize', () => {
+    if (document.getElementById('practice').classList.contains('active')) fitCanvas();
+  });
+});
+
+// ══════════════════════════════════════════════════════════
+// HOME MODE TOGGLE
+// ══════════════════════════════════════════════════════════
+function setHomeMode(m) {
+  document.getElementById('btn-mode-char').classList.toggle('active', m === 'char');
+  document.getElementById('btn-mode-word').classList.toggle('active', m === 'word');
+  const pc = document.getElementById('panel-char');
+  const pw = document.getElementById('panel-word');
+  if (m === 'char') {
+    pc.style.display = '';
+    pw.style.display = 'none';
+  } else {
+    pc.style.display = 'none';
+    pw.style.display = 'flex';
+    pw.style.flexDirection = 'column';
+    renderSaved();
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// WORD MODE
+// ══════════════════════════════════════════════════════════
+function buildPresets() {
+  const wrap = document.getElementById('preset-wrap');
+  PRESET_WORDS.forEach(w => {
+    const c = document.createElement('div'); c.className = 'preset-chip';
+    c.textContent = w;
+    c.onclick = () => { document.getElementById('inp-now').value = w; };
+    wrap.appendChild(c);
+  });
+}
+
+function renderSaved() {
+  const sw = document.getElementById('saved-wrap');
+  const sec = document.getElementById('saved-section');
+  sw.innerHTML = '';
+  if (!savedWords.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  savedWords.forEach((w, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:4px';
+    const b = document.createElement('div'); b.className = 'saved-chip'; b.textContent = w;
+    b.onclick = () => { document.getElementById('inp-now').value = w; };
+    const del = document.createElement('div');
+    del.style.cssText = 'width:20px;height:20px;border-radius:50%;background:var(--dim);display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;color:var(--muted);flex-shrink:0';
+    del.textContent = '✕';
+    del.onclick = () => { savedWords.splice(i, 1); localStorage.setItem('wl_zh_words', JSON.stringify(savedWords)); renderSaved(); };
+    row.appendChild(b); row.appendChild(del); sw.appendChild(row);
+  });
+}
+
+function saveWord() {
+  const w = document.getElementById('inp-now').value.trim();
+  if (!w || savedWords.includes(w)) return;
+  savedWords.push(w); localStorage.setItem('wl_zh_words', JSON.stringify(savedWords));
+  renderSaved();
+}
+
+function practiceWordNow() {
+  const w = document.getElementById('inp-now').value.trim();
+  if (!w) return;
+  // Build queue from each character of the word
+  const items = w.split('').map(ch => {
+    const found = ALL_CHARS.find(d => d.ch === ch);
+    return found || { ch, py: '', en: '', th: '' };
+  });
+  startSession(items);
+}
+
+// ══════════════════════════════════════════════════════════
+// PICKER
+// ══════════════════════════════════════════════════════════
+function openPicker(group) {
+  pickerGroup = group;
+  sel.clear();
+  const titles = {
+    numbers:'Numbers 数字', greetings:'People & Greetings 问候',
+    family:'Family 家人', objects:'Objects 物品',
+    verbs:'Verbs 动词', adjectives:'Adjectives 形容词', all:'All Characters 全部'
+  };
+  document.getElementById('picker-title').textContent = titles[group] || group;
+  renderFilterChips();
+  renderTiles();
+  updateFab();
+  show('picker');
+}
+
+function getPickerData() {
+  return pickerGroup === 'all' ? ALL_CHARS : (CHAR_DATA[pickerGroup] || []);
+}
+
+function renderFilterChips() {
+  // No sub-filters needed for Chinese (unlike Thai consonant classes)
+  document.getElementById('filt-chips').innerHTML = '';
+}
+
+function renderTiles() {
+  const el = document.getElementById('tiles'); el.innerHTML = '';
+  getPickerData().forEach(item => {
+    const d = document.createElement('div');
+    d.className = 'tile' + (sel.has(item.ch) ? ' on' : '');
+    d.innerHTML = `<div class="tc">${item.ch}</div><div class="tn">${item.py}</div><div class="tbadge">✓</div>`;
+    d.onclick = () => {
+      sel.has(item.ch) ? sel.delete(item.ch) : sel.add(item.ch);
+      d.classList.toggle('on', sel.has(item.ch));
+      updateFab();
+    };
+    el.appendChild(d);
+  });
+}
+
+function selectAll() {
+  getPickerData().forEach(i => sel.add(i.ch)); renderTiles(); updateFab();
+}
+
+function updateFab() {
+  const fab = document.getElementById('fab');
+  document.getElementById('fab-txt').textContent = sel.size ? `Practice ${sel.size}` : 'Practice';
+  fab.classList.toggle('show', sel.size > 0);
+}
+
+function startFromPicker() {
+  const items = getPickerData().filter(i => sel.has(i.ch));
+  // Shuffle
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  startSession(items);
+}
+
+// ══════════════════════════════════════════════════════════
+// SESSION
+// ══════════════════════════════════════════════════════════
+function startSession(items) {
+  queue = items; qi = 0;
+  show('practice');
+  // Use double-rAF like Thai app so layout is fully computed before fitting
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    fitCanvas();
+    loadChar(0);
+  }));
+}
+
+function loadChar(idx) {
+  const it = queue[idx];
+  document.getElementById('p-char').textContent = it.ch;
+  document.getElementById('g-char').textContent = it.ch;
+  document.getElementById('g-pinyin').textContent = it.py || '—';
+  document.getElementById('g-translation').textContent =
+    [it.en, it.th].filter(Boolean).join(' · ') || '—';
+  document.getElementById('p-txt').textContent = `${idx + 1} / ${queue.length}`;
+  document.getElementById('p-fill').style.width = `${((idx + 1) / queue.length) * 100}%`;
+  document.getElementById('next-lbl').textContent = idx + 1 >= queue.length ? 'Done' : 'Next';
+  clearCanvas();
+  redrawGrid();
+  // Auto-speak the character after a brief delay so the screen transition settles
+  setTimeout(() => speak(it.ch), 300);
+}
+
+function nextChar() {
+  qi++;
+  if (qi >= queue.length) { showSummary(); return; }
+  loadChar(qi);
+}
+
+// ══════════════════════════════════════════════════════════
+// CANVAS FIT & GRID
+// ══════════════════════════════════════════════════════════
+function fitCanvas() {
+  // Canvas fills all flex:1 space — just sync pixel dimensions to CSS size
+  const w = cvs.clientWidth;
+  const h = cvs.clientHeight;
+  if (w === 0 || h === 0) return;
+  cvs.width  = w;
+  cvs.height = h;
+  redrawGrid();
+}
+
+// 米字格 drawn directly on the single canvas (background layer)
+function redrawGrid() {
+  const w = cvs.width, h = cvs.height;
+  ctx.clearRect(0, 0, w, h);
+
+  // White background
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, w, h);
+
+  // Square grid region centered in canvas
+  const sq = Math.min(w, h) - 4;
+  const ox = Math.floor((w - sq) / 2);
+  const oy = Math.floor((h - sq) / 2);
+  const cx = ox + sq / 2, cy = oy + sq / 2;
+
+  // Outer border
+  ctx.strokeStyle = '#E8522A';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([]);
+  ctx.strokeRect(ox + 1, oy + 1, sq - 2, sq - 2);
+
+  // Dashed guides
+  ctx.strokeStyle = 'rgba(232,82,42,0.28)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([5, 5]);
+  ln(ox, cy, ox + sq, cy);          // horizontal mid
+  ln(cx, oy, cx, oy + sq);          // vertical mid
+  ln(ox, oy, ox + sq, oy + sq);     // diagonal TL→BR
+  ln(ox + sq, oy, ox, oy + sq);     // diagonal TR→BL
+  ctx.setLineDash([]);
+
+  // Ghost character
+  if (ghostOn && queue[qi]) {
+    const ch = queue[qi].ch;
+    const fs = Math.floor(sq * 0.76);
+    ctx.font = `900 ${fs}px "Noto Sans SC", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'rgba(232,82,42,0.13)';
+    ctx.fillText(ch, cx, cy);
+  }
+}
+
+function ln(x1, y1, x2, y2) {
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+}
+
+function clearCanvas() {
+  redrawGrid();
+}
+
+function toggleGhost() {
+  ghostOn = !ghostOn;
+  const btn = document.getElementById('btn-ghost');
+  btn.textContent = ghostOn ? '👁' : '🙈';
+  btn.title = ghostOn ? 'Hide ghost' : 'Show ghost';
+  redrawGrid();
+}
+
+// ══════════════════════════════════════════════════════════
+// DRAWING
+// ══════════════════════════════════════════════════════════
+function xy(e) {
+  const r = cvs.getBoundingClientRect();
+  const scX = cvs.width  / r.width;
+  const scY = cvs.height / r.height;
+  return [(e.clientX - r.left) * scX, (e.clientY - r.top) * scY];
+}
+
+function pd(e) {
+  e.preventDefault();
+  cvs.setPointerCapture(e.pointerId);
+  drawing = true; [lx, ly] = xy(e);
+  ctx.beginPath(); ctx.arc(lx, ly, brushSize / 2, 0, Math.PI * 2);
+  ctx.fillStyle = brushColor; ctx.fill();
+}
+
+function pm(e) {
+  if (!drawing) return; e.preventDefault();
+  const [x, y] = xy(e);
+  ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(x, y);
+  ctx.strokeStyle = brushColor; ctx.lineWidth = brushSize;
+  ctx.lineCap = ctx.lineJoin = 'round'; ctx.stroke();
+  [lx, ly] = [x, y];
+}
+
+function pu() { drawing = false; }
+
+// ══════════════════════════════════════════════════════════
+// SPEECH — Web Speech API, zh-CN
+// ══════════════════════════════════════════════════════════
+let ttsVoice = null;
+
+function initTTS() {
+  // Voices may load async; cache the best zh-CN voice
+  function pickVoice() {
+    const voices = speechSynthesis.getVoices();
+    // Prefer zh-CN, then zh-TW, then any zh
+    ttsVoice =
+      voices.find(v => v.lang === 'zh-CN') ||
+      voices.find(v => v.lang === 'zh-TW') ||
+      voices.find(v => v.lang.startsWith('zh')) ||
+      null;
+  }
+  pickVoice();
+  if (typeof speechSynthesis !== 'undefined') {
+    speechSynthesis.addEventListener('voiceschanged', pickVoice);
+  }
+}
+
+function speakCurrent() {
+  if (!queue[qi]) return;
+  speak(queue[qi].ch);
+}
+
+function speak(text) {
+  if (typeof speechSynthesis === 'undefined') return;
+  speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'zh-CN';
+  utt.rate = 0.85;   // slightly slower for a child learning
+  utt.pitch = 1.0;
+  if (ttsVoice) utt.voice = ttsVoice;
+
+  const btn = document.getElementById('btn-speak');
+  if (btn) btn.classList.add('speaking');
+  utt.onend = utt.onerror = () => { if (btn) btn.classList.remove('speaking'); };
+
+  speechSynthesis.speak(utt);
+}
+
+
+function initColorDots() {
+  const el = document.getElementById('cdots');
+  COLORS.forEach(c => {
+    const d = document.createElement('div'); d.className = 'cdot' + (c === brushColor ? ' on' : '');
+    d.style.background = c;
+    d.onclick = () => {
+      brushColor = c;
+      document.querySelectorAll('.cdot').forEach(x => x.classList.remove('on'));
+      document.querySelectorAll('.cdot').forEach(x => { if (x.style.background === c) x.classList.add('on'); });
+    };
+    el.appendChild(d);
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// SUMMARY
+// ══════════════════════════════════════════════════════════
+function showSummary() {
+  show('summary');
+  document.getElementById('sum-avg').textContent = '完成! ✓';
+  document.getElementById('sum-trophy').textContent = '🏆';
+  document.getElementById('st-done').textContent  = queue.length;
+  document.getElementById('st-total').textContent = queue.length;
+  const wrap = document.getElementById('sum-results'); wrap.innerHTML = '';
+  queue.forEach(it => {
+    const p = document.createElement('div'); p.className = 'res-pill';
+    p.innerHTML = `<span style="font-family:'Noto Sans SC',sans-serif;font-weight:700">${it.ch}</span>`
+      + `<span style="font-size:0.7rem;color:var(--muted)">${it.py}</span>`;
+    wrap.appendChild(p);
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// SCREEN NAV
+// ══════════════════════════════════════════════════════════
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'practice') requestAnimationFrame(() => requestAnimationFrame(fitCanvas));
+}
+</script>
+</body>
+</html>
